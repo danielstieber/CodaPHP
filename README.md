@@ -43,11 +43,11 @@ $result = $coda->getRow($docId, 'Products', 'Goatmilk');
 var_dump($result['values']['Price']);
 // Add the new product 'Goatcheese'
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatcheese', 'Price' => 23.50, 'Status' => 'available'])) {
-	echo 'Product added';
+  echo 'Product added';
 }
 // Update the new status of 'Goatmilk'
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatmilk', 'Status' => 'sold out'], ['Title'])) {
-	echo 'Product upated';
+  echo 'Product upated';
 }
 ```
 
