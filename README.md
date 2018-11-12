@@ -1,6 +1,7 @@
 CodaPHP
 =======================
-![Coda API Version](https://img.shields.io/badge/Coda_API_version-v1beta1-orange.svg)
+[![Current Version](https://img.shields.io/github/release/danielstieber/codaphp.svg?style=flat-square)](https://github.com/danielstieber/codaphp/releases)
+[![Coda API Version](https://img.shields.io/badge/Coda_API_version-0.1.1--beta-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1beta1)
 
 CodaPHP is a library that makes it easy to use data from [Coda](https://www.coda.io) 
 docs your in web projects by using the [Coda API (Beta)](https://coda.io/developers/apis/v1beta1). 
@@ -29,7 +30,7 @@ var_dump($result);
 ```
 
 ### Handling table data
-Let's say we have the table 'Products' in our Coda doc:
+Let's assume you have the table 'Products' in your Coda doc:
 #### Products
 | Title   ⚑ | Price | Status      |
 |-----------|-------|-------------|
@@ -41,10 +42,13 @@ Let's say we have the table 'Products' in our Coda doc:
 $docId = $coda->getDocId('<YOUR DOC URL>');
 $result = $coda->getRow($docId, 'Products', 'Goatmilk');
 var_dump($result['values']['Price']);
+// Will show you 'float(14.90)'
+
 // Add the new product 'Goatcheese'
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatcheese', 'Price' => 23.50, 'Status' => 'available'])) {
   echo 'Product added';
 }
+
 // Update the new status of 'Goatmilk'
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatmilk', 'Status' => 'sold out'], ['Title'])) {
   echo 'Product upated';
