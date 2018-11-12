@@ -1,15 +1,16 @@
 {
     "name": "danielstieber/coda-php",
     "description": "CodaPHP is a library that makes it easy to use Coda API in web projects.",
+    "keywords": ["library", "coda", "api"],
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Daniel Stieber",
-            "email": "daniel.w.stieber@gmail.com"
+            "email": "daniel.w.stieber@gmail.com",
+            "homepage": "http://www.danielstieber.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=7.0.0",
         "guzzlehttp/guzzle": "~6.0"
