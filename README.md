@@ -49,7 +49,7 @@ if($coda->insertRows($docId, 'Products', ['Title' => 'Goatcheese', 'Price' => 23
   echo 'Product added';
 }
 
-// Update the new status of 'Goatmilk'
+// Change the status of the product 'Goatmilk' to 'sold out'
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatmilk', 'Status' => 'sold out'], ['Title'])) {
   echo 'Product upated';
 }
@@ -93,7 +93,7 @@ $coda->getSection('<DOC ID>', '<SECTION NAME OR ID>'); // Get a section in a doc
 $coda->listFolders('<DOC ID>'); // List all folders in a doc
 $coda->getFolder('<DOC ID>', '<FOLDER NAME OR ID>'); //Get a folder in a doc
 ```
-### Tables, columns and rows
+### Tables, Columns and Rows
 ```PHP
 $coda->listTables('<DOC ID>'); // List all tables in a doc
 $coda->getTable('<DOC ID>', '<TABLE NAME OR ID>'); // Get a table in a doc
@@ -106,10 +106,10 @@ $coda->insertRows('<DOC ID>', '<TABLE NAME OR ID>', [['<COLUMN ID OR NAME>' => '
 
 // Examples:
 $coda->insertRows('<DOC ID>', 'todos', ['title' => 'Shower']); // Adds one row to 'todo'
-$coda->insertRows('<DOC ID>', 'todos', [['title' => 'Wash dishes'], ['title' => 'Clean car']]); // Adds two row to 'todo'
+$coda->insertRows('<DOC ID>', 'todos', [['title' => 'Wash dishes'], ['title' => 'Clean car']]); // Adds two rows to 'todo'
 $coda->insertRows('<DOC ID>', 'todos', [['title' => 'Shower', 'status' => 'done'], ['title' => 'Buy goatcheese']], ['title']); // Updates the status of 'Shower' and inserts a new todo
 
-$coda->updateRow('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>', ['<COLUMN ID OR NAME>' => '<VALUE>']); // List all row in a table
+$coda->updateRow('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>', ['<COLUMN ID OR NAME>' => '<VALUE>']); // List all rows in a table
 $coda->getRow('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>'); // Get a row in a table
 $coda->deleteRow('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>'); // Deletes a row in a table
 ```
@@ -121,11 +121,12 @@ $coda->getFormula('<DOC ID>', '<FORMULA NAME OR ID>'); // Get a formula in a doc
 $coda->listControls('<DOC ID>'); // List all controls in a doc
 $coda->getControl('<DOC ID>', '<CONTROL NAME OR ID>'); //Get a control in a doc
 ```
-### Account
+### Account and other
 ```PHP
 $coda->whoAmI(); // Get information about the current account
+$coda->resolveLink('<DOC URL>'); // Resolves a link 
 ```
 
 ## Changelog
 ### 0.0.1 (November 11, 2018)
-* Initial version based on version1beta1 of Coda API
+* Initial version based on v0.1.1-beta of Coda API
