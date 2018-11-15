@@ -145,9 +145,9 @@ class CodaPHP
 	 * @param string $section Id or name of a section
 	 * @return array
 	 */
-	public function getSection($doc, $sesectionc)
+	public function getSection($doc, $section)
 	{
-		$res = $this->request('/docs/'.$doc.'/sections/'.$section);
+		$res = $this->request('/docs/'.$doc.'/sections/'.$this->prepareStrings($section));
 		return $res;
 	}
 	/**
@@ -171,7 +171,7 @@ class CodaPHP
 	 */
 	public function getFolder($doc, $folder)
 	{
-		$res = $this->request('/docs/'.$doc.'/folders/'.$folder);
+		$res = $this->request('/docs/'.$doc.'/folders/'.$this->prepareStrings($folder));
 		return $res;
 	}
 	/**
@@ -195,7 +195,7 @@ class CodaPHP
 	 */
 	public function getTable($doc, $table) 
 	{
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table);
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table));
 		return $res;
 	}
 	/**
@@ -208,7 +208,7 @@ class CodaPHP
 	 */
 	public function listColumns($doc, $table, array $params = [])
 	{
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table.'/columns?'.http_build_query($params));
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/columns?'.http_build_query($params));
 		return $res;
 	}
 	/**
@@ -221,7 +221,7 @@ class CodaPHP
 	 */
 	public function getColumn($doc, $table, $column)
 	{
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table.'/columns/'.$column);
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/columns/'.$this->prepareStrings($column));
 		return $res;
 	}
 	/**
@@ -235,7 +235,7 @@ class CodaPHP
 	public function listRows($doc, $table, array $params = [])
 	{
 		$params['useColumnNames'] = $params['useColumnNames'] ?? true; 
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table.'/rows?'.http_build_query($params));
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows?'.http_build_query($params));
 		return $res;
 	}
 	/**
@@ -259,7 +259,7 @@ class CodaPHP
 			$i++;
 		}
 		$params['keyColumns'] = $keyColumns;
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table.'/rows', ['json' => $params], 'POST', true);
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows', ['json' => $params], 'POST', true);
 		if($res['statusCode'] === 202) {
 			return true;
 		} else {
@@ -278,7 +278,7 @@ class CodaPHP
 	public function getRow($doc, $table, $row, array $params = [])
 	{
 		$params['useColumnNames'] = $params['useColumnNames'] ?? true; 
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table.'/rows/'.$row.'?'.http_build_query($params));
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row).'?'.http_build_query($params));
 		return $res;
 	}
 	/**
@@ -295,7 +295,7 @@ class CodaPHP
 		foreach($rowData as $column => $value) {
 			$params['row']['cells'][] = ['column' => $column, 'value' => $value];
 		}
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table.'/rows/'.$row, ['json' => $params], 'PUT');
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row), ['json' => $params], 'PUT');
 		return $res;
 	}
 	/**
@@ -308,7 +308,7 @@ class CodaPHP
 	 */
 	public function deleteRow($doc, $table, $row)
 	{
-		$res = $this->request('/docs/'.$doc.'/tables/'.$table.'/rows/'.$row, [], 'DELETE');
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row), [], 'DELETE');
 		return $res;
 	}
 	/**
@@ -332,7 +332,7 @@ class CodaPHP
 	 */
 	public function getFormula($doc, $formula)
 	{
-		$res = $this->request('/docs/'.$doc.'/formulas/'.$formula);
+		$res = $this->request('/docs/'.$doc.'/formulas/'.$this->prepareStrings($formula));
 		return $res;
 	}
 	/**
@@ -356,7 +356,7 @@ class CodaPHP
 	 */
 	public function getControl($doc, $control)
 	{
-		$res = $this->request('/docs/'.$doc.'/controls/'.$control);
+		$res = $this->request('/docs/'.$doc.'/controls/'.$this->prepareStrings($control));
 		return $res;
 	}
 	/**
@@ -367,7 +367,7 @@ class CodaPHP
 	 */
 	public function resolveLink($url)
 	{
-		$res = $this->request('/resolveBrowserLink?url='.$url);
+		$res = $this->request('/resolveBrowserLink?url='.$this->prepareStrings($url));
 		return $res;
 	}
 	/**
@@ -380,5 +380,16 @@ class CodaPHP
 	{
 		if (is_array(reset($array))) { $return = $this->countDimension(reset($array)) + 1; } else { $return = 1; }
 		return $return;
-	} 
+	}
+	/**
+	 * Prepares strings to be used in url
+	 * 
+	 * @param string $string
+	 * @return string
+	 */
+	protected function prepareStrings($string) {
+		// urleconde converts space to + but Coda can only read space as space or as %20. A little workaround encodes the string and converts space to %20 instead of +.
+		$parts = array_map('urlencode', explode(' ', $string));
+		return implode('%20', $parts);
+	}
 }

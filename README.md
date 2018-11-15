@@ -128,5 +128,7 @@ $coda->resolveLink('<DOC URL>'); // Resolves a link
 ```
 
 ## Changelog
+### 0.0.2 (November 15, 2018)
+* Fixed an issue regarding table names with special characters (Thanks to Oleg from Coda for mentioning this)
 ### 0.0.1 (November 11, 2018)
 * Initial version based on v0.1.1-beta of Coda API
