@@ -51,7 +51,7 @@ if($coda->insertRows($docId, 'Products', ['Title' => 'Goatcheese', 'Price' => 23
 
 // Change the status of the product 'Goatmilk' to 'sold out'
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatmilk', 'Status' => 'sold out'], ['Title'])) {
-  echo 'Product upated';
+  echo 'Product updated';
 }
 ```
 
@@ -65,7 +65,7 @@ Generate your token in the Coda profile settings. *Notice: Everyone with this to
 The method names are inspired by the wording of the [official Coda API documentation](https://coda.io/developers/apis/v1beta1) and are listed below.
 
 ### Parameters
-All parameters can be found in the [official Coda API documentation](https://coda.io/developers/apis/v1beta1). Just add an associativve array with your parameters to selected functions. The parameter _useColumnNames_ is set true by default in all 'row' functions. I list the important ones below.
+All parameters can be found in the [official Coda API documentation](https://coda.io/developers/apis/v1beta1). Just add an associative array with your parameters to selected functions. The parameter _useColumnNames_ is set true by default in all 'row' functions. I list the important ones below.
 
 ### Response
 In case of success, responses are mostly untouched but converted to PHP arrays. Exception is `insertRow()` function, which provides a boolean true in case of success.
