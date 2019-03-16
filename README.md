@@ -44,6 +44,7 @@ $docId = $coda->getDocId('<YOUR DOC URL>');
 // Lists only Products with status 'available' (currently only one filter allowed)
 $availableProducts = $coda->listRows($docId, 'Products', ['query' => ['status' => 'available']]);
 
+// Show value of one cell
 $result = $coda->getRow($docId, 'Products', 'Goatmilk');
 var_dump($result['values']['Price']);
 // Will show you 'float(14.90)'
@@ -132,6 +133,8 @@ $coda->resolveLink('<DOC URL>'); // Resolves a link
 ```
 
 ## Changelog
+### 0.0.3 (March 16, 2019)
+* Fixed an issue with using queries in listRows (Thanks to [Al Chen](https://github.com/albertc44) from Coda for mentioning this)
 ### 0.0.2 (November 15, 2018)
 * Fixed an issue regarding table names with special characters (Thanks to Oleg from Coda for mentioning this)
 ### 0.0.1 (November 11, 2018)
