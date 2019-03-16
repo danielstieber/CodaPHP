@@ -22,7 +22,7 @@ php composer.phar require danielstieber/coda-php
 and add it to your project:
 ```PHP
 require './vendor/autoload.php';
-$coda = new CodaPHP('<YOUR API TOKEN>');
+$coda = new CodaPHP\CodaPHP('<YOUR API TOKEN>');
 
 // List all your docs
 $result = $coda->listDocs();
@@ -40,6 +40,10 @@ Let's assume you have the table 'Products' in your Coda doc:
 ```PHP
 // Get the price of the goatmilk
 $docId = $coda->getDocId('<YOUR DOC URL>');
+
+// Lists only Products with status 'available' (currently only one filter allowed)
+$availableProducts = $coda->listRows($docId, 'Products', ['query' => ['status' => 'available']]);
+
 $result = $coda->getRow($docId, 'Products', 'Goatmilk');
 var_dump($result['values']['Price']);
 // Will show you 'float(14.90)'
