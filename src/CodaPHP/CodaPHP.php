@@ -235,6 +235,9 @@ class CodaPHP
 	public function listRows($doc, $table, array $params = [])
 	{
 		$params['useColumnNames'] = $params['useColumnNames'] ?? true; 
+		if(isset($params['query'])) {
+			$params['query'] = $this->array_key_first($params['query']).':"'.reset($params['query']).'"';
+		};
 		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows?'.http_build_query($params));
 		return $res;
 	}
@@ -391,5 +394,15 @@ class CodaPHP
 		// urleconde converts space to + but Coda can only read space as space or as %20. A little workaround encodes the string and converts space to %20 instead of +.
 		$parts = array_map('urlencode', explode(' ', $string));
 		return implode('%20', $parts);
+	}
+	/**
+	 * Gets the first key of an array. Standard function in PHP >= 7.3.0.
+	 * 
+	 * @param array $array
+	 * @return mixed
+	 */
+	protected function array_key_first(array $array)
+	{
+	    return $array ? array_keys($array)[0] : null;
 	}
 }

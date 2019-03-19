@@ -22,7 +22,7 @@ php composer.phar require danielstieber/coda-php
 and add it to your project:
 ```PHP
 require './vendor/autoload.php';
-$coda = new CodaPHP('<YOUR API TOKEN>');
+$coda = new CodaPHP\CodaPHP('<YOUR API TOKEN>');
 
 // List all your docs
 $result = $coda->listDocs();
@@ -40,6 +40,11 @@ Let's assume you have the table 'Products' in your Coda doc:
 ```PHP
 // Get the price of the goatmilk
 $docId = $coda->getDocId('<YOUR DOC URL>');
+
+// Lists only Products with status 'available' (currently only one filter allowed)
+$availableProducts = $coda->listRows($docId, 'Products', ['query' => ['status' => 'available']]);
+
+// Show value of one cell
 $result = $coda->getRow($docId, 'Products', 'Goatmilk');
 var_dump($result['values']['Price']);
 // Will show you 'float(14.90)'
@@ -51,7 +56,7 @@ if($coda->insertRows($docId, 'Products', ['Title' => 'Goatcheese', 'Price' => 23
 
 // Change the status of the product 'Goatmilk' to 'sold out'
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatmilk', 'Status' => 'sold out'], ['Title'])) {
-  echo 'Product upated';
+  echo 'Product updated';
 }
 ```
 
@@ -65,7 +70,7 @@ Generate your token in the Coda profile settings. *Notice: Everyone with this to
 The method names are inspired by the wording of the [official Coda API documentation](https://coda.io/developers/apis/v1beta1) and are listed below.
 
 ### Parameters
-All parameters can be found in the [official Coda API documentation](https://coda.io/developers/apis/v1beta1). Just add an associativve array with your parameters to selected functions. The parameter _useColumnNames_ is set true by default in all 'row' functions. I list the important ones below.
+All parameters can be found in the [official Coda API documentation](https://coda.io/developers/apis/v1beta1). Just add an associative array with your parameters to selected functions. The parameter _useColumnNames_ is set true by default in all 'row' functions. I list the important ones below.
 
 ### Response
 In case of success, responses are mostly untouched but converted to PHP arrays. Exception is `insertRow()` function, which provides a boolean true in case of success.
@@ -128,6 +133,8 @@ $coda->resolveLink('<DOC URL>'); // Resolves a link
 ```
 
 ## Changelog
+### 0.0.3 (March 16, 2019)
+* Fixed an issue with using queries in listRows (Thanks to [Al Chen](https://github.com/albertc44) from Coda for mentioning this)
 ### 0.0.2 (November 15, 2018)
 * Fixed an issue regarding table names with special characters (Thanks to Oleg from Coda for mentioning this)
 ### 0.0.1 (November 11, 2018)
