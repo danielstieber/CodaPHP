@@ -7,6 +7,8 @@ CodaPHP is a library that makes it easy to use data from [Coda](https://www.coda
 docs your in web projects by using the [Coda API (Beta)](https://coda.io/developers/apis/v1beta1). 
 Coda itself as well as the API is still in beta. Use on your own risk.
 
+→ [**Get 10$ discount on Coda paid plans when signing up with this link**](https://coda.io/?r=Qjx7OzpmTa2L6IPfkY-anw)
+
 Easily use all available API calls with one library including
 * List all documents
 * Read data from tables, formulas and controls
