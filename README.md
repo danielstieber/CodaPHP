@@ -1,7 +1,7 @@
 CodaPHP
 =======================
 [![Current Version](https://img.shields.io/github/release/danielstieber/codaphp.svg?style=flat-square)](https://github.com/danielstieber/codaphp/releases)
-[![Coda API Version](https://img.shields.io/badge/Coda_API_version-0.2.3--beta-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1beta1)
+[![Coda API Version](https://img.shields.io/badge/Coda_API_version-0.2.4--beta-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1beta1)
 
 CodaPHP is a library that makes it easy to use data from [Coda](https://www.coda.io) 
 docs your in web projects by using the [Coda API (Beta)](https://coda.io/developers/apis/v1beta1). 
