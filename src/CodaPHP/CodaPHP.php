@@ -119,10 +119,12 @@ class CodaPHP
 	 * @param string $source Id of a doc to use as source (creates a copy)
 	 * @return array 
 	 */
-	public function createDoc($title = '', $source = '')
+	public function createDoc($title = '', $source = '', $folderId = '', $timezone = '')
 	{
 		$params['title'] = $title;
 		$params['sourceDoc'] = $source;
+		$params['folderId'] = $folderId;
+		$params['timezone'] = $timezone;
 		$res = $this->request('/docs', ['json' => $params], 'POST');
 		return $res;
 	}
@@ -199,6 +201,30 @@ class CodaPHP
 		return $res;
 	}
 	/**
+	 * Returns views in a doc
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listViews
+	 * @return array
+	 */
+	public function listViews($doc, array $params = [])
+	{
+		$res = $this->request('/docs/'.$doc.'/views?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns a view in a doc
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $view Id or name of a view
+	 * @return array
+	 */
+	public function getView($doc, $view) 
+	{
+		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view));
+		return $res;
+	}
+	/**
 	 * Returns columns in a table
 	 * 
 	 * @param string $doc Id of a doc
@@ -209,6 +235,19 @@ class CodaPHP
 	public function listColumns($doc, $table, array $params = [])
 	{
 		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/columns?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns columns in a view
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $view Id or name of a view
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listColumns
+	 * @return array
+	 */
+	public function listViewColumns($doc, $view, array $params = [])
+	{
+		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/columns?'.http_build_query($params));
 		return $res;
 	}
 	/**
@@ -242,15 +281,33 @@ class CodaPHP
 		return $res;
 	}
 	/**
+	 * Returns rows in a view
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $view Id or name of a view
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listRows , useColumnNames is set true by default
+	 * @return array
+	 */
+	public function listViewRows($doc, $view, array $params = [])
+	{
+		$params['useColumnNames'] = $params['useColumnNames'] ?? true; 
+		if(isset($params['query'])) {
+			$params['query'] = $this->array_key_first($params['query']).':"'.reset($params['query']).'"';
+		};
+		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows?'.http_build_query($params));
+		return $res;
+	}
+	/**
 	 * Inserts or updates a row in a table
 	 * 
 	 * @param string $doc Id of a doc
 	 * @param string $table Id or name of a table
 	 * @param array $rowData Associative array with your row data. Can be one row as array or an array of mulitple rows as an array (arrayception). Keys has to be column ids or names.
 	 * @param array $keyColumns Array with ids or names of columns. Coda will update rows instead of inserting, if keyColumns are matching
+	 * @param  bool $disableParsing Disables automatic column format parsing. Default false.
 	 * @return bool
 	 */
-	public function insertRows($doc, $table, array $rowData, array $keyColumns = [])
+	public function insertRows($doc, $table, array $rowData, array $keyColumns = [], $disableParsing = false)
 	{
 		if($this->countDimension($rowData) == 1)
 			$rowData = [$rowData]; 
@@ -262,7 +319,8 @@ class CodaPHP
 			$i++;
 		}
 		$params['keyColumns'] = $keyColumns;
-		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows', ['json' => $params], 'POST', true);
+		$query['disableParsing'] = $disableParsing;
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows', ['query' => $query, 'json' => $params], 'POST', true);
 		if($res['statusCode'] === 202) {
 			return true;
 		} else {
@@ -291,18 +349,39 @@ class CodaPHP
 	 * @param string $table Id or name of a table
 	 * @param string $row Id or name of a row
 	 * @param array $rowData Associative array with your row data
+	 * @param  bool $disableParsing Disables automatic column format parsing. Default false.
 	 * @return string Id of the updated row
 	 */
-	public function updateRow($doc, $table, $row, array $rowData)
+	public function updateRow($doc, $table, $row, array $rowData, $disableParsing = false)
 	{
 		foreach($rowData as $column => $value) {
 			$params['row']['cells'][] = ['column' => $column, 'value' => $value];
 		}
-		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row), ['json' => $params], 'PUT');
+		$query['disableParsing'] = $disableParsing;
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row), ['query' => $query, 'json' => $params], 'PUT');
 		return $res;
 	}
 	/**
-	 * Deltes a row in a table
+	 * Updates a row in a view
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $table Id or name of a table
+	 * @param string $row Id or name of a row
+	 * @param array $rowData Associative array with your row data
+	 * @param  bool $disableParsing Disables automatic column format parsing. Default false.
+	 * @return string Id of the updated row
+	 */
+	public function updateViewRow($doc, $view, $row, array $rowData, $disableParsing = false)
+	{
+		foreach($rowData as $column => $value) {
+			$params['row']['cells'][] = ['column' => $column, 'value' => $value];
+		}
+		$query['disableParsing'] = $disableParsing;
+		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows/'.$this->prepareStrings($row), ['query' => $query, 'json' => $params], 'PUT');
+		return $res;
+	}
+	/**
+	 * Deletes a row in a table
 	 * 
 	 * @param string $doc Id of a doc
 	 * @param string $table Id or name of a table
@@ -312,6 +391,47 @@ class CodaPHP
 	public function deleteRow($doc, $table, $row)
 	{
 		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row), [], 'DELETE');
+		return $res;
+	}
+	/**
+	 * Deletes a row in a view
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $view Id or name of a view
+	 * @param string $row Id or name of a row
+	 * @return string Id of the deleted row
+	 */
+	public function deleteViewRow($doc, $view, $row)
+	{
+		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows/'.$this->prepareStrings($row), [], 'DELETE');
+		return $res;
+	}
+	/**
+	 * Pushes a button in a table
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $table Id or name of a table
+	 * @param string $row Id or name of a row
+	 * @param string $column Id or name of a column
+	 * @return string Id of the deleted row
+	 */
+	public function pushButton($doc, $table, $row, $column)
+	{
+		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row).'/buttons/'.$this->prepareStrings($column), [], 'POST');
+		return $res;
+	}
+	/**
+	 * Pushes a button in a view
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $view Id or name of a view
+	 * @param string $row Id or name of a row
+	 * @param string $column Id or name of a column
+	 * @return string Id of the deleted row
+	 */
+	public function pushViewButton($doc, $view, $row, $column)
+	{
+		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows/'.$this->prepareStrings($row).'/buttons/'.$this->prepareStrings($column), [], 'POST');
 		return $res;
 	}
 	/**
