@@ -8,8 +8,8 @@ use GuzzleHttp\Exception\BadResponseException;
  * CodaPHP Library
  * 
  * CodaPHP is a library that makes it easy to use data from Coda (https://www.coda.io)
- * docs your in web projects by using the Coda API (Beta) (https://coda.io/developers/apis/v1beta1).
- * Coda itself as well as the API is still in beta. Use on your own risk.
+ * docs your in web projects by using the Coda API (https://coda.io/developers/apis/v1).
+ * Use on your own risk.
  * 
  * This file is licensed under the MIT license.
  */
@@ -25,7 +25,7 @@ class CodaPHP
 	/**
 	 * Base URL of the Coda Api
 	 */
-	const API_BASE = 'https://coda.io/apis/v1beta1';
+	const API_BASE = 'https://coda.io/apis/v1';
 
 	/**
 	 * Creates new guzzle client with authentication
@@ -93,7 +93,7 @@ class CodaPHP
 	/**
 	 * Returns an array of docs
 	 * 
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listDocs
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/listDocs
 	 * @return array 
 	 */
 	public function listDocs(array $params = [])
@@ -129,58 +129,34 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Returns sections in a doc
+	 * Returns pages in a doc
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listSections
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/listPages
 	 * @return array
 	 */
-	public function listSections($doc, array $params = [])
+	public function listPages($doc, array $params = [])
 	{
-		$res = $this->request('/docs/'.$doc.'/sections?'.http_build_query($params));
+		$res = $this->request('/docs/'.$doc.'/pages?'.http_build_query($params));
 		return $res;
 	}
 	/**
-	 * Returns a section in a doc
+	 * Returns a page in a doc
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param string $section Id or name of a section
+	 * @param string $page Id or name of a page
 	 * @return array
 	 */
-	public function getSection($doc, $section)
+	public function getPage($doc, $page)
 	{
-		$res = $this->request('/docs/'.$doc.'/sections/'.$this->prepareStrings($section));
+		$res = $this->request('/docs/'.$doc.'/pages/'.$this->prepareStrings($page));
 		return $res;
 	}
 	/**
-	 * Returns folders in a doc
+	 * Returns tables or views in a doc
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listFolders
-	 * @return array
-	 */
-	public function listFolders($doc, array $params = [])
-	{
-		$res = $this->request('/docs/'.$doc.'/folders?'.http_build_query($params));
-		return $res;
-	}
-	/**
-	 * Returns a folder in a doc
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $folder Id or name of a folder
-	 * @return array
-	 */
-	public function getFolder($doc, $folder)
-	{
-		$res = $this->request('/docs/'.$doc.'/folders/'.$this->prepareStrings($folder));
-		return $res;
-	}
-	/**
-	 * Returns tables in a doc
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listTables
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/listTables
 	 * @return array
 	 */
 	public function listTables($doc, array $params = [])
@@ -189,10 +165,10 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Returns a table in a doc
+	 * Returns a table or a view in a doc
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param string $table Id or name of a table
+	 * @param string $table Id or name of a table or view
 	 * @return array
 	 */
 	public function getTable($doc, $table) 
@@ -201,53 +177,16 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Returns views in a doc
+	 * Returns columns in a table or view
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listViews
-	 * @return array
-	 */
-	public function listViews($doc, array $params = [])
-	{
-		$res = $this->request('/docs/'.$doc.'/views?'.http_build_query($params));
-		return $res;
-	}
-	/**
-	 * Returns a view in a doc
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $view Id or name of a view
-	 * @return array
-	 */
-	public function getView($doc, $view) 
-	{
-		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view));
-		return $res;
-	}
-	/**
-	 * Returns columns in a table
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $table Id or name of a table
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listColumns
+	 * @param string $table Id or name of a table or view
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/listColumns
 	 * @return array
 	 */
 	public function listColumns($doc, $table, array $params = [])
 	{
 		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/columns?'.http_build_query($params));
-		return $res;
-	}
-	/**
-	 * Returns columns in a view
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $view Id or name of a view
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listColumns
-	 * @return array
-	 */
-	public function listViewColumns($doc, $view, array $params = [])
-	{
-		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/columns?'.http_build_query($params));
 		return $res;
 	}
 	/**
@@ -264,11 +203,11 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Returns rows in a table
+	 * Returns rows in a table or view
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param string $table Id or name of a table
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listRows , useColumnNames is set true by default
+	 * @param string $table Id or name of a table or view
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/listRows , useColumnNames is set true by default
 	 * @return array
 	 */
 	public function listRows($doc, $table, array $params = [])
@@ -281,22 +220,7 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Returns rows in a view
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $view Id or name of a view
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listRows , useColumnNames is set true by default
-	 * @return array
-	 */
-	public function listViewRows($doc, $view, array $params = [])
-	{
-		$params['useColumnNames'] = $params['useColumnNames'] ?? true; 
-		if(isset($params['query'])) {
-			$params['query'] = $this->array_key_first($params['query']).':"'.reset($params['query']).'"';
-		};
-		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows?'.http_build_query($params));
-		return $res;
-	}
+
 	/**
 	 * Inserts or updates a row in a table
 	 * 
@@ -333,7 +257,7 @@ class CodaPHP
 	 * @param string $doc Id of a doc
 	 * @param string $table Id or name of a table
 	 * @param string $row Id or name of a column
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/getRow , useColumnNames is set true by default
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/getRow , useColumnNames is set true by default
 	 * @return array
 	 */
 	public function getRow($doc, $table, $row, array $params = [])
@@ -343,10 +267,10 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Updates a row in a table
+	 * Updates a row in a table or view
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param string $table Id or name of a table
+	 * @param string $table Id or name of a table or view
 	 * @param string $row Id or name of a row
 	 * @param array $rowData Associative array with your row data
 	 * @param  bool $disableParsing Disables automatic column format parsing. Default false.
@@ -362,29 +286,10 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Updates a row in a view
+	 * Deletes a row in a table or view
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param string $table Id or name of a table
-	 * @param string $row Id or name of a row
-	 * @param array $rowData Associative array with your row data
-	 * @param  bool $disableParsing Disables automatic column format parsing. Default false.
-	 * @return string Id of the updated row
-	 */
-	public function updateViewRow($doc, $view, $row, array $rowData, $disableParsing = false)
-	{
-		foreach($rowData as $column => $value) {
-			$params['row']['cells'][] = ['column' => $column, 'value' => $value];
-		}
-		$query['disableParsing'] = $disableParsing;
-		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows/'.$this->prepareStrings($row), ['query' => $query, 'json' => $params], 'PUT');
-		return $res;
-	}
-	/**
-	 * Deletes a row in a table
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $table Id or name of a table
+	 * @param string $table Id or name of a table or view
 	 * @param string $row Id or name of a row
 	 * @return string Id of the deleted row
 	 */
@@ -393,24 +298,12 @@ class CodaPHP
 		$res = $this->request('/docs/'.$doc.'/tables/'.$this->prepareStrings($table).'/rows/'.$this->prepareStrings($row), [], 'DELETE');
 		return $res;
 	}
+
 	/**
-	 * Deletes a row in a view
+	 * Pushes a button in a table or view
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param string $view Id or name of a view
-	 * @param string $row Id or name of a row
-	 * @return string Id of the deleted row
-	 */
-	public function deleteViewRow($doc, $view, $row)
-	{
-		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows/'.$this->prepareStrings($row), [], 'DELETE');
-		return $res;
-	}
-	/**
-	 * Pushes a button in a table
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $table Id or name of a table
+	 * @param string $table Id or name of a table or view
 	 * @param string $row Id or name of a row
 	 * @param string $column Id or name of a column
 	 * @return string Id of the deleted row
@@ -421,24 +314,10 @@ class CodaPHP
 		return $res;
 	}
 	/**
-	 * Pushes a button in a view
-	 * 
-	 * @param string $doc Id of a doc
-	 * @param string $view Id or name of a view
-	 * @param string $row Id or name of a row
-	 * @param string $column Id or name of a column
-	 * @return string Id of the deleted row
-	 */
-	public function pushViewButton($doc, $view, $row, $column)
-	{
-		$res = $this->request('/docs/'.$doc.'/views/'.$this->prepareStrings($view).'/rows/'.$this->prepareStrings($row).'/buttons/'.$this->prepareStrings($column), [], 'POST');
-		return $res;
-	}
-	/**
 	 * Returns formulas in a doc
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listFormulas
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/listFormulas
 	 * @return array
 	 */
 	public function listFormulas($doc, array $params = [])
@@ -462,7 +341,7 @@ class CodaPHP
 	 * Returns controls in a doc
 	 * 
 	 * @param string $doc Id of a doc
-	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1beta1#operation/listControls
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#operation/listControls
 	 * @return array
 	 */
 	public function listControls($doc, array $params = [])
@@ -480,6 +359,17 @@ class CodaPHP
 	public function getControl($doc, $control)
 	{
 		$res = $this->request('/docs/'.$doc.'/controls/'.$this->prepareStrings($control));
+		return $res;
+	}
+	/**
+	 * Returns mutation status of asynchronous mutation
+	 * 
+	 * @param string $requestId Id of a request
+	 * @return array
+	 */
+	public function getMutationStatus($requestId)
+	{
+		$res = $this->request('/mutationStatus/'.$requestId);
 		return $res;
 	}
 	/**

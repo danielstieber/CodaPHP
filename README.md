@@ -1,19 +1,19 @@
 CodaPHP
 =======================
 [![Current Version](https://img.shields.io/github/release/danielstieber/codaphp.svg?style=flat-square)](https://github.com/danielstieber/codaphp/releases)
-[![Coda API Version](https://img.shields.io/badge/Coda_API_version-0.2.4--beta-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1beta1)
+[![Coda API Version](https://img.shields.io/badge/Coda_API_version-1.0.0-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1)
 
 CodaPHP is a library that makes it easy to use data from [Coda](https://www.coda.io) 
-docs your in web projects by using the [Coda API (Beta)](https://coda.io/developers/apis/v1beta1). 
-Coda itself as well as the API is still in beta. Use on your own risk.
-
-→ [**Get 10$ discount on Coda paid plans when signing up with this link**](https://coda.io/?r=Qjx7OzpmTa2L6IPfkY-anw)
+docs your in web projects by using the [Coda API](https://coda.io/developers/apis/v1). 
+Use on your own risk.
 
 Easily use all available API calls with one library including
 * List all documents
 * Read data from tables, formulas and controls
 * Add/modify rows
 * and a lot more
+
+→ [**Get 10$ discount on Coda paid plans when signing up with this link**](https://coda.io/?r=Qjx7OzpmTa2L6IPfkY-anw)
 
 ## Quickstart
 ### Installation and basic usage
@@ -92,49 +92,36 @@ $coda->getDoc('<DOC ID>'); // Get a specific doc
 $coda->createDoc('My new doc'); // Create a new doc
 $coda->createDoc('Copy of my old doc', '<DOC ID>'); // Copy a doc
 ```
-### Folders and Sections
+### Pages (former Folders & Sections)
 ```PHP
-$coda->listSections('<DOC ID>'); // List all sections in a doc
-$coda->getSection('<DOC ID>', '<SECTION NAME OR ID>'); // Get a section in a doc
-
-$coda->listFolders('<DOC ID>'); // List all folders in a doc
-$coda->getFolder('<DOC ID>', '<FOLDER NAME OR ID>'); //Get a folder in a doc
+$coda->listPages('<DOC ID>'); // List all sections in a doc
+$coda->getPage('<DOC ID>', '<PAGE NAME OR ID>'); // Get a section in a doc
 ```
-### Tables, Columns and Rows
+### Tables/Views, Columns and Rows
 ```PHP
 $coda->listTables('<DOC ID>'); // List all tables in a doc
-$coda->getTable('<DOC ID>', '<TABLE NAME OR ID>'); // Get a table in a doc
+$coda->getTable('<DOC ID>', '<TABLE/VIEW NAME OR ID>'); // Get a table in a doc
 
-$coda->listColumns('<DOC ID>', '<TABLE NAME OR ID>'); // List all columns in a table
-$coda->getColumn('<DOC ID>', '<TABLE NAME OR ID>', '<COLUMN NAME OR ID>'); // Get a column in a table
+$coda->listColumns('<DOC ID>', '<TABLE/VIEW NAME OR ID>'); // List all columns in a table
+$coda->getColumn('<DOC ID>', '<TABLE/VIEW NAME OR ID>', '<COLUMN NAME OR ID>'); // Get a column in a table
 
-$coda->listRows('<DOC ID>', '<TABLE NAME OR ID>'); // List all row in a table
-$coda->insertRows('<DOC ID>', '<TABLE NAME OR ID>', [['<COLUMN ID OR NAME>' => '<VALUE>']], ['<KEYCOLUMN>']); // Insert/updates a row in a table
+$coda->listRows('<DOC ID>', '<TABLE/VIEW NAME OR ID>'); // List all row in a table
+$coda->insertRows('<DOC ID>', '<TABLE/VIEW NAME OR ID>', [['<COLUMN ID OR NAME>' => '<VALUE>']], ['<KEYCOLUMN>']); // Insert/updates a row in a table
 
 // Examples:
 $coda->insertRows('<DOC ID>', 'todos', ['title' => 'Shower']); // Adds one row to 'todo'
 $coda->insertRows('<DOC ID>', 'todos', [['title' => 'Wash dishes'], ['title' => 'Clean car']]); // Adds two rows to 'todo'
 $coda->insertRows('<DOC ID>', 'todos', [['title' => 'Shower', 'status' => 'done'], ['title' => 'Buy goatcheese']], ['title']); // Updates the status of 'Shower' and inserts a new todo
 
-$coda->updateRow('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>', ['<COLUMN ID OR NAME>' => '<VALUE>']); // Updates a row in a table
-$coda->getRow('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>'); // Get a row in a table
-$coda->deleteRow('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>'); // Deletes a row in a table
+$coda->updateRow('<DOC ID>', '<TABLE/VIEW NAME OR ID>', '<ROW NAME OR ID>', ['<COLUMN ID OR NAME>' => '<VALUE>']); // Updates a row in a table
+$coda->getRow('<DOC ID>', '<TABLE/VIEW NAME OR ID>', '<ROW NAME OR ID>'); // Get a row in a table
+$coda->deleteRow('<DOC ID>', '<TABLE/VIEW NAME OR ID>', '<ROW NAME OR ID>'); // Deletes a row in a table
 ```
 ### Working with Views
-```PHP
-$coda->listViews('<DOC ID>'); // List all views in a doc
-$coda->getView('<DOC ID>', '<VIEW NAME OR ID>'); // Get a view in a doc
-
-$coda->listViewColumns('<DOC ID>', '<VIEW NAME OR ID>'); // List all columns in a view
-
-$coda->listViewRows('<DOC ID>', '<VIEW NAME OR ID>'); // List all rows in a view
-$coda->updateViewRow('<DOC ID>', '<VIEW NAME OR ID>', '<ROW NAME OR ID>', ['<COLUMN ID OR NAME>' => '<VALUE>']); // List all rows in a view
-$coda->deleteViewRow('<DOC ID>', '<VIEW NAME OR ID>', '<ROW NAME OR ID>'); // Deletes a row in a view
-```
+Since Coda API Version 1.0.0 there are no seperate view methods. All view operations can be done via the table methods.
 ### Pushing Buttons
 ```PHP
-$coda->pushButton('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>', '<COLUMN NAME OR ID'>); // Pushes the button on the given column in a table
-$coda->pushViewButton('<DOC ID>', '<TABLE NAME OR ID>', '<ROW NAME OR ID>', '<COLUMN NAME OR ID'>); // Pushes the button on the given column in a ivew
+$coda->pushButton('<DOC ID>', '<TABLE/VIEW NAME OR ID>', '<ROW NAME OR ID>', '<COLUMN NAME OR ID'>); // Pushes the button on the given column in a table
 ```
 ### Formulas and Controls
 ```PHP
@@ -148,18 +135,31 @@ $coda->getControl('<DOC ID>', '<CONTROL NAME OR ID>'); //Get a control in a doc
 ```PHP
 $coda->whoAmI(); // Get information about the current account
 $coda->resolveLink('<DOC URL>'); // Resolves a link 
+$coda->getMutationStatus('<Request Id>'); // Resolves a link 
 ```
 
 ## Changelog
+### 0.1.0 (August 15, 2020)
+* Update to API version 1.0.0.
+* Breaking changes:
+	- Sections & Folders have been replaced by pages
+	- Removed 'view' methods. You can access views via table methods.
+* New features:
+	- Added mutation status method
+You can read more about API version 1.0.0 [here](https://community.coda.io/t/launched-coda-api-v1/17248)
+
 ### 0.0.4 (February 16, 2020)
 * Updated to API version 0.2.4-beta. New features:
 	- Pushing buttons inside of tables & views
 	- Getting and interacting with views
 	- Creating docs in folders
 	- Ability to disable parsing of cell values
+
 ### 0.0.3 (March 16, 2019)
 * Fixed an issue with using queries in listRows (Thanks to [Al Chen](https://github.com/albertc44) from Coda for mentioning this)
+
 ### 0.0.2 (November 15, 2018)
 * Fixed an issue regarding table names with special characters (Thanks to Oleg from Coda for mentioning this)
+
 ### 0.0.1 (November 11, 2018)
 * Initial version based on v0.1.1-beta of Coda API
