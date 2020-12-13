@@ -83,7 +83,7 @@ All parameters can be found in the [official Coda API documentation](https://cod
 In case of success, responses are mostly untouched but converted to PHP arrays. Exception is `insertRow()` function, which provides a boolean true in case of success.
 In case of an error, the response includes the statusCode and provided error message, also untouched and converted to an array.
 
-### Caching
+### Cache data
 Every API call may take a few seconds. It is recommended to store results and only call for new when necessary. The library provides a simple caching mechanic to store received data in a .codaphp_cache folder. **This mehanic is optional** and needs to be activated. Learn more in the [caching instructions](#Caching)
 
 ## Documentation
