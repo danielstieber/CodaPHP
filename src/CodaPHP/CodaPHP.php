@@ -16,21 +16,23 @@ use GuzzleHttp\Exception\BadResponseException;
 class CodaPHP
 {
 	/**
-	 * The API Token and the guzzle client
+	 * The API Token, the guzzle client and cache settings
 	 * @var string $apiToken
 	 * @var obj $client
+	 * @var bool $cacheData if true, tries to cache requests as local files
+	 * @var int $maxAge expiry time of a cachefile in seconds
 	 */
-	protected $apiToken, $client;
+	protected $apiToken, $client, $cacheData, $maxAge;
 
 	/**
 	 * Base URL of the Coda Api
 	 */
 	const API_BASE = 'https://coda.io/apis/v1';
-
+	const CACHE_DIR = '.codaphp_cache' . DIRECTORY_SEPARATOR;
 	/**
-	 * Creates new guzzle client with authentication
+	 * Creates new guzzle client with authentication and 
 	 */
-	public function __construct($apiToken)
+	public function __construct($apiToken, $cacheData = false, $maxAge = 604800)
 	{
 		$this->apiToken = $apiToken;
 		$this->client = new Client([
@@ -38,6 +40,13 @@ class CodaPHP
 				'Authorization' => 'Bearer '.$this->apiToken
 			]
 		]);
+		if($cacheData && (is_dir(self::CACHE_DIR) || mkdir(self::CACHE_DIR))) {
+			// caching is only available when the cache folder exists / can be created
+			$this->cacheData = $cacheData;
+		} else {
+			$this->cacheData = false;
+		}
+		$this->maxAge = $maxAge;
 	}
 	/**
 	 * Performs a request using guzzle
@@ -46,19 +55,42 @@ class CodaPHP
 	 * @param array $params Guzzle request params
 	 * @param string $method HTTP request method
 	 * @param bool $addstatus When true, the return will include the HTTP status code
+	 * @param bool $ignoreCache When true, the caching option will be ignored
 	 * @return array
 	 */
-	protected function request($url, array $params = [], $method = 'GET', $addStatus = false)
+	protected function request($url, array $params = [], $method = 'GET', $addStatus = false, $ignoreCache = false)
 	{
+		$cacheFile = self::CACHE_DIR . md5(json_encode([$url => $params])) . '.json';
+		if($method == 'GET' && $ignoreCache === false && $this->cacheData === true && file_exists($cacheFile)) { // checks for cached response
+			$cache = json_decode(file_get_contents($cacheFile), true);
+			if((time() - $cache[0]) <= $this->maxAge) {
+				$httpCode = $cache[1];
+				$dataArray = $cache[2];
+				if($addStatus) {
+					return ['statusCode' => $httpCode, 'result' => $dataArray];
+				} else {
+					return $dataArray;
+				}
+			} else {
+				unlink($cacheFile);
+			}
+		}
+
 		try {
 			$response = $this->client->request($method, self::API_BASE . $url, $params);
 		} catch (BadResponseException $e) {
 			$errorContent = $e->getResponse()->getBody()->getContents();
 			return(json_decode($errorContent, true));
 		}
+
 		$httpCode = $response->getStatusCode();
 		$responseString = $response->getBody()->getContents();
 		$dataArray = json_decode($responseString, true);
+
+		if($method == 'GET' && $ignoreCache === false && $this->cacheData === true) { // caches response
+			$cache = [time(), $httpCode, $dataArray];
+			$filecreation = file_put_contents($cacheFile, json_encode($cache));
+		}
 
 		if (is_array($dataArray) && JSON_ERROR_NONE === json_last_error()) {
 			if($addStatus) {
@@ -369,7 +401,7 @@ class CodaPHP
 	 */
 	public function getMutationStatus($requestId)
 	{
-		$res = $this->request('/mutationStatus/'.$requestId);
+		$res = $this->request('/mutationStatus/'.$requestId, [], 'GET', false, false);
 		return $res;
 	}
 	/**
@@ -380,8 +412,106 @@ class CodaPHP
 	 */
 	public function resolveLink($url)
 	{
-		$res = $this->request('/resolveBrowserLink?url='.$this->prepareStrings($url));
+		$res = $this->request('/resolveBrowserLink?url='.$this->prepareStrings($url), [], 'GET', false, false);
 		return $res;
+	}
+	/**
+	 * Returns ACL medadata
+	 * 
+	 * @param string $doc Id of a doc
+	 * @return array
+	 */
+	public function getACLMeta($doc)
+	{
+		$res = $this->request('/docs/'.$doc.'/acl/metadata');
+		return $res;
+	}
+	/**
+	 * Returns a list of permissions
+	 * 
+	 * @param string $doc Id of a doc
+	 * @return array
+	 */
+	public function listPermissions($doc)
+	{
+		$res = $this->request('/docs/'.$doc.'/acl/permissions', [], 'GET', false, false);
+		return $res;
+	}
+	/**
+	 * Adds permissions to the doc
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $access type of access (readonly, write, comment, none)
+	 * @param string|array $principal metadata about a principal
+	 * @param bool $notify if true, sends notification email
+	 * @return array
+	 */
+	public function addPermission($doc, $access, $principal, $notify = false)
+	{
+		$params['access'] = $access;
+		$params['principal'] = $principal;
+		$params['suppressEmail'] = !$notify;
+		$res = $this->request('/docs/'.$doc.'/acl/permissions', ['json' => $params], 'POST');
+		return $res;
+	}
+	/**
+	 * Deletes permissions to the doc
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $permissionId the id of the permission entry
+	 * @return array
+	 */
+	public function deletePermission($doc, $permissionId)
+	{
+		$res = $this->request('/docs/'.$doc.'/acl/permissions/'.$permissionId, [], 'DELETE');
+		return $res;
+	}
+	/**
+	 * Adds a user to the doc (shortcut for permissions methods)
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $email email address of a user
+	 * @param string $access type of access (readonly, write, comment, none)
+	 * @param bool $notify if true, sends notification email
+	 * @return mixed
+	 */
+	public function addUser($doc, $email, $access = "write", $notify = false)
+	{
+		$principal = [
+			'type' => 'email',
+			'email' => $email
+		];
+		return $this->addPermission($doc, $access, $principal, $notify);
+	}
+	/**
+	 * Removes a user from the doc (shortcut for permissions methods)
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $email email address of a user
+	 * @return mixed
+	 */
+	public function deleteUser($doc, $email)
+	{
+		$permissions = $this->listPermissions($doc);
+		foreach($permissions['items'] as $permission) {
+			if($permission['principal']['email'] == $email) {
+				$id = $permission['id'];
+			}
+		}
+		if(isset($id)) {
+			return $this->deletePermission($doc, $id);
+		} else {
+			return false;
+		}
+	}
+	/**
+	 * Cleares the cache folder
+	 * 
+	 * @param 
+	 */
+	public function clearCache()
+	{
+		array_map( 'unlink', array_filter((array) glob(self::CACHE_DIR.'*') ) );
 	}
 	/**
 	 * Counts dimensions of an array

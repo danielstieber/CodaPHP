@@ -1,16 +1,21 @@
 CodaPHP
 =======================
-[![Current Version](https://img.shields.io/github/release/danielstieber/codaphp.svg?style=flat-square)](https://github.com/danielstieber/codaphp/releases)
-[![Coda API Version](https://img.shields.io/badge/Coda_API_version-1.0.0-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1)
+[![Latest Stable](https://img.shields.io/github/release/danielstieber/codaphp.svg?style=flat-square)](https://github.com/danielstieber/codaphp/releases)
+[![Coda API Version](https://img.shields.io/badge/Coda_API_version-1.1.0-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1)
+![Downloads](https://img.shields.io/packagist/dt/danielstieber/coda-php?style=flat-square)
 
-CodaPHP is a library that makes it easy to use data from [Coda](https://www.coda.io) 
-docs your in web projects by using the [Coda API](https://coda.io/developers/apis/v1). 
-Use on your own risk.
+* [Quickstart](#Quickstart)
+* [Detailed Documentation](#Documentation)
+* [Caching](#Caching)
+* [Changelog](#Changelog)
+
+CodaPHP is a library that makes it easy to use data from [Coda](https://www.coda.io) docs in web projects by using the [Coda API](https://coda.io/developers/apis/v1). 
 
 Easily use all available API calls with one library including
 * List all documents
 * Read data from tables, formulas and controls
 * Add/modify rows
+* Manage doc permissions
 * and a lot more
 
 → [**Get 10$ discount on Coda paid plans when signing up with this link**](https://coda.io/?r=Qjx7OzpmTa2L6IPfkY-anw)
@@ -78,6 +83,9 @@ All parameters can be found in the [official Coda API documentation](https://cod
 In case of success, responses are mostly untouched but converted to PHP arrays. Exception is `insertRow()` function, which provides a boolean true in case of success.
 In case of an error, the response includes the statusCode and provided error message, also untouched and converted to an array.
 
+### Caching
+Every API call may take a few seconds. It is recommended to store results and only call for new when necessary. The library provides a simple caching mechanic to store received data in a .codaphp_cache folder. **This mehanic is optional** and needs to be activated. Learn more in the [caching instructions](#Caching)
+
 ## Documentation
 ```PHP
 $coda = new CodaPHP('<YOUR API TOKEN>'); // Create instance of CodaPHP
@@ -131,6 +139,18 @@ $coda->getFormula('<DOC ID>', '<FORMULA NAME OR ID>'); // Get a formula in a doc
 $coda->listControls('<DOC ID>'); // List all controls in a doc
 $coda->getControl('<DOC ID>', '<CONTROL NAME OR ID>'); //Get a control in a doc
 ```
+### Manage permissions
+```PHP
+$coda->listPermissions('<DOC ID>'); // Get information about users & permissions for a doc
+$coda->addUser('<DOC ID>', '<EMAIL>'); // Add a user to a doc (default permissions are 'write')
+$coda->addUser('<DOC ID>', '<EMAIL>', 'readonly', true); // Add a 'readonly' user and notify via email
+$coda->deleteUser('<DOC ID>', '<EMAIL>'); // Removes a user from the doc
+$coda->addPermission('<DOC ID>', '<PERMISSION TYPE>', '<PRINCIPAL>', '<NOTIFY>'); // Add a permission to a doc
+$coda->deletePermission('<DOC ID>', '<PERMISSION ID>'); // Remove a permission from a doc
+$coda->getACLMetadata('<DOC ID>'); // Returns the ACL metadata of a doc
+```
+Learn more about permission settings with the API [here](https://coda.io/developers/apis/v1#tag/ACLs).
+
 ### Account and other
 ```PHP
 $coda->whoAmI(); // Get information about the current account
@@ -138,7 +158,39 @@ $coda->resolveLink('<DOC URL>'); // Resolves a link
 $coda->getMutationStatus('<Request Id>'); // Resolves a link 
 ```
 
+### Caching
+The library can cache API requests in JSON files. If caching is activated, the library tries to create a `.codaphp_cache` folder in your project root. If it can't create or find the folder, it will deactivate caching. You can also create the folder on your own and set CHMOD so the library can read & write files in it. Only doc data & content will be cached, no permissions, links or mutation status!
+```PHP
+$coda = new CodaPHP('<YOUR API TOKEN>', '<ACTIVATE CACHE>', '<EXPIRY TIME IN SECONDS>'); // Instance creation with otptional caching & expiry time
+$coda = new CodaPHP('<YOUR API TOKEN>', true); // Instance with activated caching
+```
+By default, the cache will expire after 7 days. You can manually change the expiry time.
+```PHP
+$coda = new CodaPHP('<YOUR API TOKEN>', true, 86400); // Activate caching and set cache to 1 day (in seconds)
+$coda = new CodaPHP('<YOUR API TOKEN>', true, -1); // Activate caching wihtout expiration
+```
+You can also clear the cache manually
+```PHP
+$coda->clearCache(); // Clears the whole cache
+```
+#### Control cache inside the doc
+A simple way to control the cache status from the coda doc is a button that triggers the clear cache method.
+```PHP
+$coda = new CodaPHP('<YOUR API TOKEN>', true);
+if(isset($_GET['clearCache'])) {
+	$coda->clearCache();
+}
+```
+Now you can add a "open hyperlink"-button in your doc that opens https://yourdomain.com/?clearCache. After clicking the button the website will receive the latest data and saves it in the cache again.
+[Imgur](https://i.imgur.com/it4rkxV.png)
+
 ## Changelog
+### 0.2.0 (December 13, 2020)
+* Update to API version 1.1.0.
+* New features:
+	- Added ACL permission management
+	- Added optional caching
+
 ### 0.1.0 (August 15, 2020)
 * Update to API version 1.0.0.
 * Breaking changes:
