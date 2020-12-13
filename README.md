@@ -167,7 +167,6 @@ $coda = new CodaPHP('<YOUR API TOKEN>', true); // Instance with activated cachin
 By default, the cache will expire after 7 days. You can manually change the expiry time.
 ```PHP
 $coda = new CodaPHP('<YOUR API TOKEN>', true, 86400); // Activate caching and set cache to 1 day (in seconds)
-$coda = new CodaPHP('<YOUR API TOKEN>', true, -1); // Activate caching wihtout expiration
 ```
 You can also clear the cache manually
 ```PHP
@@ -182,7 +181,7 @@ if(isset($_GET['clearCache'])) {
 }
 ```
 Now you can add a "open hyperlink"-button in your doc that opens https://yourdomain.com/?clearCache. After clicking the button the website will receive the latest data and saves it in the cache again.
-[Imgur](https://i.imgur.com/it4rkxV.png)
+![clear cache button](https://i.imgur.com/it4rkxV.png)
 
 ## Changelog
 ### 0.2.0 (December 13, 2020)
