@@ -184,7 +184,7 @@ Now you can add a "open hyperlink"-button in your doc that opens https://yourdom
 ![clear cache button](https://i.imgur.com/it4rkxV.png)
 
 ## Changelog
-### 0.2.0 (December 13, 2020)
+### 0.2.0 (January 3, 2021)
 * Update to API version 1.1.0.
 * New features:
 	- Added ACL permission management
