@@ -1,7 +1,7 @@
 CodaPHP
 =======================
 [![Latest Stable](https://img.shields.io/github/release/danielstieber/codaphp.svg?style=flat-square)](https://github.com/danielstieber/codaphp/releases)
-[![Coda API Version](https://img.shields.io/badge/Coda_API_version-1.1.0-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1)
+[![Coda API Version](https://img.shields.io/badge/Coda_API_version-1.2.6-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1)
 ![Downloads](https://img.shields.io/packagist/dt/danielstieber/coda-php?style=flat-square)
 
 * [Quickstart](#Quickstart)
@@ -65,6 +65,13 @@ if($coda->insertRows($docId, 'Products', ['Title' => 'Goatcheese', 'Price' => 23
 if($coda->insertRows($docId, 'Products', ['Title' => 'Goatmilk', 'Status' => 'sold out'], ['Title'])) {
   echo 'Product updated';
 }
+```
+### Triggering automations
+Since May 2022, Coda automations can be triggered via webhooks – and via CodaPHP. To trigger an automation, the automation must be set to "Webhook invoked". To run the automation you need the doc ID an the ID of the automation rule. You can find the rule ID when you click on the 3 dots (kebap menu) above the rule step settings.
+
+```PHP
+// Trigger the automation
+$result = $coda->runAutomation('<YOUR DOC ID>', '<THE RULE ID>');
 ```
 
 ## Overview
@@ -150,6 +157,10 @@ $coda->deletePermission('<DOC ID>', '<PERMISSION ID>'); // Remove a permission f
 $coda->getACLMetadata('<DOC ID>'); // Returns the ACL metadata of a doc
 ```
 Learn more about permission settings with the API [here](https://coda.io/developers/apis/v1#tag/ACLs).
+### Run automations / trigger webhooks
+```PHP
+$coda->runAutomation('<YOUR DOC ID>', '<THE RULE ID>');
+```
 
 ### Account and other
 ```PHP
@@ -184,6 +195,11 @@ Now you can add a "open hyperlink"-button in your doc that opens https://yourdom
 ![clear cache button](https://i.imgur.com/it4rkxV.png)
 
 ## Changelog
+### 0.3.0 (May 24, 2022)
+* Update to API version 1.2.6.
+* New features:
+	- Trigger "Webhook invoked" automations
+
 ### 0.2.0 (January 3, 2021)
 * Update to API version 1.1.0.
 * New features:

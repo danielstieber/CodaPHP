@@ -505,6 +505,18 @@ class CodaPHP
 		}
 	}
 	/**
+	 * Runs an automation of type "webhook invoked" in a doc
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param string $automation Id of the automation rule
+	 * @return mixed
+	 */
+	public function runAutomation($doc, $ruleId)
+	{
+		$res = $this->request('/docs/'.$doc.'/hooks/automation/'.$ruleId, [], 'POST');
+		return $res;
+	}
+	/**
 	 * Cleares the cache folder
 	 * 
 	 * @param 
