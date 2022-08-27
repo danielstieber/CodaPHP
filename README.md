@@ -1,11 +1,12 @@
 CodaPHP
 =======================
 [![Latest Stable](https://img.shields.io/github/release/danielstieber/codaphp.svg?style=flat-square)](https://github.com/danielstieber/codaphp/releases)
-[![Coda API Version](https://img.shields.io/badge/Coda_API_version-1.2.6-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1)
+[![Coda API Version](https://img.shields.io/badge/Coda_API_version-1.3.0-orange.svg?style=flat-square)](https://coda.io/developers/apis/v1)
 ![Downloads](https://img.shields.io/packagist/dt/danielstieber/coda-php?style=flat-square)
 
 * [Quickstart](#Quickstart)
 * [Detailed Documentation](#Documentation)
+* [Doc & Pack Analytics](#Analytics)
 * [Caching](#Caching)
 * [Changelog](#Changelog)
 
@@ -91,7 +92,7 @@ In case of success, responses are mostly untouched but converted to PHP arrays. 
 In case of an error, the response includes the statusCode and provided error message, also untouched and converted to an array.
 
 ### Cache data
-Every API call may take a few seconds. It is recommended to store results and only call for new when necessary. The library provides a simple caching mechanic to store received data in a .codaphp_cache folder. **This mehanic is optional** and needs to be activated. Learn more in the [caching instructions](#Caching)
+Every API call may take a few seconds. It is recommended to store results and only call for new when necessary. The library provides a simple caching mechanic to store received data in a .codaphp_cache folder. **This mechanic is optional** and needs to be activated. Learn more in the [caching instructions](#Caching)
 
 ## Documentation
 ```PHP
@@ -166,10 +167,26 @@ $coda->runAutomation('<YOUR DOC ID>', '<THE RULE ID>');
 ```PHP
 $coda->whoAmI(); // Get information about the current account
 $coda->resolveLink('<DOC URL>'); // Resolves a link 
-$coda->getMutationStatus('<Request Id>'); // Resolves a link 
+$coda->getMutationStatus('<REQUEST ID>'); // Resolves a link 
 ```
 
-### Caching
+### Analytics
+```PHP
+$coda->listDocAnalytics(); // List all docs with analytics data
+$coda->listDocAnalytics(['query' => 'Goats', 'sinceDate' => '2022-08-02', 'sinceDate' => '2022-08-04']); // List docs about "Goats" with analytics data between 2nd and 4th of August 2022
+// All parameters for all methods can be found in the official API docs: https://coda.io/developers/apis/v1#tag/Analytics/operation/listDocAnalytics
+$coda->listPageAnalytics('<DOC ID>'); // List analytics data on page level of given doc
+$coda->listPackAnalytics(); // List all packs where user has edit rights with analytics data
+$coda->listPackAnalytics(['workspaceId' => 'ws-123Ave']); // List all packs where user has edit rights with analytics data from workspace ws-123Ave
+$coda->listPackFormulaAnalytics('<PACK ID'); // List analytisc data on formula level of given pack
+
+$coda->getDocAnalyticsSummery(); // Returns summarized analytics data for available docs.
+$coda->getPackAnalyticsSummery(); // Returns summarized analytics data for available packs.
+
+$coda->getAnalyticsUpdatedDay(); // Returns days based on Pacific Standard Time when analytics were last updated. Usually 1 day ago PST.
+```
+
+## Caching
 The library can cache API requests in JSON files. If caching is activated, the library tries to create a `.codaphp_cache` folder in your project root. If it can't create or find the folder, it will deactivate caching. You can also create the folder on your own and set CHMOD so the library can read & write files in it. Only doc data & content will be cached, no permissions, links or mutation status!
 ```PHP
 $coda = new CodaPHP('<YOUR API TOKEN>', '<ACTIVATE CACHE>', '<EXPIRY TIME IN SECONDS>'); // Instance creation with otptional caching & expiry time
@@ -195,6 +212,13 @@ Now you can add a "open hyperlink"-button in your doc that opens https://yourdom
 ![clear cache button](https://i.imgur.com/it4rkxV.png)
 
 ## Changelog
+### 0.4.0 (August 28, 2022)
+* Update to API version 1.3.0
+* New features:
+	- Added Analytics endpoints
+* Bug fixes:
+	- Improved getDocId() regex for better matching
+
 ### 0.3.0 (May 24, 2022)
 * Update to API version 1.2.6.
 * New features:

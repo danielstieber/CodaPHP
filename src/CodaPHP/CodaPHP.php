@@ -108,7 +108,7 @@ class CodaPHP
 	 * @return string 10-digit Coda doc id
 	 */
 	public static function getDocId($url) {
-		$re = '/coda.io\/d\/.*?_d(.{10})\//m';
+		$re = '/coda.io\/d\/.*?_d(.{10})\/*/m';
 		preg_match($re, $url, $res);
 		return $res[1] ?? false;
 	}
@@ -516,6 +516,86 @@ class CodaPHP
 		$res = $this->request('/docs/'.$doc.'/hooks/automation/'.$ruleId, [], 'POST');
 		return $res;
 	}
+
+	/**
+	 * Returns analytics data for available docs per day.
+	 * 
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#tag/Analytics/operation/listDocAnalytics
+	 * @return array
+	 */
+	public function listDocAnalytics(array $params = [])
+	{
+		$res = $this->request('/analytics/docs?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns analytics data for a given doc within the day. This method will return a 401 if the given doc is not in a Team or Enterprise workspace.
+	 * 
+	 * @param string $doc Id of a doc
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#tag/Analytics/operation/listPageAnalytics
+	 * @return array
+	 */
+	public function listPageAnalytics($doc, array $params = [])
+	{
+		$res = $this->request('/analytics/docs/'.$doc.'/pages?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns analytics data for Packs the user can edit..
+	 * 
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#tag/Analytics/operation/listPackAnalytics
+	 * @return array
+	 */
+	public function listPackAnalytics(array $params = [])
+	{
+		$res = $this->request('/analytics/packs?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns analytics data for Pack formulas.
+	 * 
+	 * @param string $pack Id of a pack
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#tag/Analytics/operation/listPackFormulaAnalytics
+	 * @return array
+	 */
+	public function listPackFormulaAnalytics($pack, array $params = [])
+	{
+		$res = $this->request('/analytics/packs/'.$pack.'/formulas?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns summarized analytics data for available docs.
+	 * 
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#tag/Analytics/operation/listDocAnalyticsSummary
+	 * @return array
+	 */
+	public function getDocAnalyticsSummary(array $params = [])
+	{
+		$res = $this->request('/analytics/docs/summary?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns summarized analytics data for Packs the user can edit.
+	 * 
+	 * @param array $params Optional query parameters listed here https://coda.io/developers/apis/v1#tag/Analytics/operation/listPackAnalyticsSummary
+	 * @return array
+	 */
+	public function getPackAnalyticsSummary(array $params = [])
+	{
+		$res = $this->request('/analytics/packs/summary?'.http_build_query($params));
+		return $res;
+	}
+	/**
+	 * Returns days based on Pacific Standard Time when analytics were last updated.
+	 * 
+	 * @return array
+	 */
+	public function getAnalyticsUpdatedDay()
+	{
+		$res = $this->request('/analytics/updated');
+		return $res;
+	}
+
 	/**
 	 * Cleares the cache folder
 	 * 
